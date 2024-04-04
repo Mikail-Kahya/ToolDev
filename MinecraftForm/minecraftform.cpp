@@ -87,18 +87,15 @@ void MinecraftForm::on_list_cellClicked(int row, int column)
 
 void MinecraftForm::on_actionSaveAsJson_triggered()
 {
-    const QString fileName = QFileDialog::getSaveFileName(this);
-    //QFile file{ fileName };
-    //file.open(QIODevice::WriteOnly);
-    //if (!file.isOpen())
-    //    return;
+    const QString fileName = QFileDialog::getSaveFileName(this,
+                                                          tr("Json files"),
+                                                          QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+                                                          tr("Json files (*.json)"));
 
     MinecraftParser parser{};
     for (const Block& block : m_Blocks)
         parser.AddCube(Vector3{ block.position.x(), block.position.y(), block.position.z() }, block.material.toStdString());
 
     parser.SaveJson(fileName.toStdString());
-
-    //file.close();
 }
 

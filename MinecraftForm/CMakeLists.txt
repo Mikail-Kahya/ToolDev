@@ -27,6 +27,7 @@ set_target_properties(MinecraftForm PROPERTIES
     MACOSX_BUNDLE TRUE
 )
 
+target_link_libraries(MinecraftForm PRIVATE MinecraftLib)
 target_link_libraries(MinecraftForm PUBLIC
     Qt::Core
     Qt::Gui

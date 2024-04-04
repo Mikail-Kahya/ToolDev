@@ -9,11 +9,6 @@ add_subdirectory(MinecraftLib)
 add_subdirectory(MinecraftCmd)
 add_subdirectory(MinecraftForm)
 
-#TODO: link library
-target_link_libraries(MinecraftCmd PRIVATE MinecraftLib)
-target_link_libraries(MinecraftForm PRIVATE MinecraftLib)
-
-
 #TODO: set install definitions
 include(InstallRequiredSystemLibraries)
 

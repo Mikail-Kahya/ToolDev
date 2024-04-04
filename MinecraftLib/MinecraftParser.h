@@ -16,6 +16,7 @@ enum class MaterialType
 	dirt,
 	stone,
 	glass,
+	grass,
 	none
 };
 

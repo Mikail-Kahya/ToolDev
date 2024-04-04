@@ -92,6 +92,10 @@ void MinecraftParser::AddCube(const Vector3& position, MaterialType material)
 {
 	if (material == MaterialType::none)
 		return;
+
+    if (!m_Layers.contains(material))
+        m_Layers[material].material = GetMaterial(material);
+
 	m_Layers[material].cubes.emplace_back(GenerateCube(position));
 }
 
@@ -214,6 +218,10 @@ MinecraftParser::Material MinecraftParser::GetMaterial(MaterialType materialType
 		material.name = "Glass";
 		material.isOpaque = false;
 		break;
+	case MaterialType::grass:
+		material.name = "Grass";
+		material.isOpaque = false;
+		break;
 	case MaterialType::none:
 	default:
 		throw MaterialNotFoundException("No material in minecraft found!");
@@ -231,7 +239,10 @@ MaterialType MinecraftParser::GetMaterialType(const std::string& material) const
 		return MaterialType::stone;
 
 	if (material == "Glass")
-		return MaterialType::stone;
+        return MaterialType::glass;
+
+	if (material == "Grass")
+		return MaterialType::grass;
 
 	return MaterialType::none;
 }
