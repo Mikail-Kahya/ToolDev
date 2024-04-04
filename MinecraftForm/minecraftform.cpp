@@ -12,31 +12,11 @@ MinecraftForm::MinecraftForm(QWidget *parent)
 {
     ui->setupUi(this);
     ui->list->setColumnWidth(static_cast<int>(Field::destroy), 50);
-    on_actionHideForm_triggered(ui->actionHideForm->isChecked());
-    on_actionHideList_triggered(ui->actionHideList->isChecked());
 }
 
 MinecraftForm::~MinecraftForm()
 {
     delete ui;
-}
-
-void MinecraftForm::on_actionOpen_triggered()
-{
-    const QString fileName = QFileDialog::getOpenFileName(this,
-                                                          tr("Open Wavefront obj"),
-                                                          QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
-                                                          tr("Obj Files (*.obj)"));
-
-    QFile file{ fileName };
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-}
-
-void MinecraftForm::on_actionHideForm_triggered(bool checked)
-{
-    ui->formWrapper->setVisible(!checked);
 }
 
 void MinecraftForm::on_submit_clicked()
@@ -48,14 +28,7 @@ void MinecraftForm::on_submit_clicked()
     block.position.setY(ui->yInput->value());
     block.position.setZ(ui->zInput->value());
     block.material = ui->materialInput->currentText();
-    m_Blocks.emplace_back(block);
-
-    // Insert new row
-    const int row{ ui->list->rowCount() };
-    ui->list->insertRow(row);
-    ui->list->setItem(row, static_cast<int>(Field::position), new QTableWidgetItem(GetVec3Format(block.position)));
-    ui->list->setItem(row, static_cast<int>(Field::material), new QTableWidgetItem(block.material));
-    ui->list->setItem(row, static_cast<int>(Field::destroy), new QTableWidgetItem("delete"));
+    AddBlock(block);
 }
 
 QString MinecraftForm::GetVec3Format(const QVector3D &vec) const
@@ -71,11 +44,6 @@ QString MinecraftForm::GetVec3Format(const QVector3D &vec) const
     };
 }
 
-void MinecraftForm::on_actionHideList_triggered(bool checked)
-{
-    ui->listWrapper->setVisible(!checked);
-}
-
 void MinecraftForm::on_list_cellClicked(int row, int column)
 {
     if (column != static_cast<int>(Field::destroy))
@@ -83,6 +51,20 @@ void MinecraftForm::on_list_cellClicked(int row, int column)
 
     ui->list->removeRow(row);
     m_Blocks.erase(m_Blocks.begin() + row);
+}
+
+void MinecraftForm::on_actionLoad_triggered()
+{
+    const QString fileName = QFileDialog::getOpenFileName(this,
+                                                          tr("Json files"),
+                                                          QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+                                                          tr("Json files (*.json)"));
+    QFile file{ fileName };
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    // read json and set positions through library
 }
 
 void MinecraftForm::on_actionSaveAsJson_triggered()
@@ -99,3 +81,28 @@ void MinecraftForm::on_actionSaveAsJson_triggered()
     parser.SaveJson(fileName.toStdString());
 }
 
+void MinecraftForm::on_actionSaveAsObj_triggered()
+{
+    const QString fileName = QFileDialog::getSaveFileName(this,
+                                                          tr("Open Wavefront obj"),
+                                                          QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+                                                          tr("Obj Files (*.obj)"));
+
+    MinecraftParser parser{ static_cast<float>(ui->blockSizeInput->value()) };
+    for (const Block& block : m_Blocks)
+        parser.AddCube(Vector3{ block.position.x(), block.position.y(), block.position.z() }, block.material.toStdString());
+
+    parser.SaveObj(fileName.toStdString());
+}
+
+void MinecraftForm::AddBlock(const Block& block)
+{
+    m_Blocks.emplace_back(block);
+
+    // Insert new row
+    const int row{ ui->list->rowCount() };
+    ui->list->insertRow(row);
+    ui->list->setItem(row, static_cast<int>(Field::position), new QTableWidgetItem(GetVec3Format(block.position)));
+    ui->list->setItem(row, static_cast<int>(Field::material), new QTableWidgetItem(block.material));
+    ui->list->setItem(row, static_cast<int>(Field::destroy), new QTableWidgetItem("delete"));
+}

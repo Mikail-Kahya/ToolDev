@@ -21,12 +21,11 @@ public:
     ~MinecraftForm();
 
 private slots:
-    void on_actionHideList_triggered(bool checked);
-    void on_actionOpen_triggered(void);
-    void on_actionHideForm_triggered(bool checked);
     void on_submit_clicked();
     void on_list_cellClicked(int row, int column);
+    void on_actionLoad_triggered();
     void on_actionSaveAsJson_triggered();
+    void on_actionSaveAsObj_triggered();
 
 private:
     enum class Field
@@ -42,6 +41,7 @@ private:
         QString material{};
     };
 
+    void AddBlock(const Block& block);
     QString GetVec3Format(const QVector3D &vec) const;
 
     Ui::MinecraftForm *ui;
