@@ -16,7 +16,7 @@ void PrintCommandTemplate();
 
 int main(int argc, char* argv[])
 {
-	if (argc != 5)
+	if (argc < 5)
 	{
 		PrintCommandTemplate();
 		return -1;
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 	std::string inputFileName{};
 	std::string outputFileName{};
 	std::string blockSizeInput{};
-	float blockSize{};
+    float blockSize{ 1.f };
 
 	// Input checking
 	if (!FindInput(inputFileName, "-i", arguments))
@@ -95,9 +95,9 @@ bool FindInput(std::string& out, const std::string& argumentType, const Argument
 
 bool IsANumber(const std::string& text)
 {
-	const std::regex floatingPointRegex{ "^-?\\d*\\.?\\d+$" };
+	const std::regex floatingPointRegex{ "^\\d+(\\.\\d+)?$" };
 	std::smatch matches{};
-	return !std::regex_match(text, matches, floatingPointRegex);
+	return std::regex_match(text, matches, floatingPointRegex);
 }
 
 void PrintCommandTemplate()
@@ -106,7 +106,7 @@ void PrintCommandTemplate()
 	std::cout
 		<< "Command:\n"
 		<< "-----    MinecraftCmd -i inputName.json -o outputName    -----\n"
-		<< "-----    MinecraftCmd -o outputName.json -i inputName    -----\n"
+		<< "-----    MinecraftCmd -o outputName -i inputName.json    -----\n"
 		<< "\nOptional block size:\n"
 		<< "-----    ... -s 1    -----\n";
 }

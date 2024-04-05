@@ -54,13 +54,17 @@ void MinecraftForm::on_list_cellClicked(int row, int column)
 
 void MinecraftForm::on_actionLoad_triggered()
 {
-    m_Blocks.clear();
-    ui->list->clear();
-    ui->list->setRowCount(0);
     const QString fileName = QFileDialog::getOpenFileName(this,
                                                           tr("Json files"),
                                                           QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
                                                           tr("Json files (*.json)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    m_Blocks.clear();
+    ui->list->clear();
+    ui->list->setRowCount(0);
 
     MinecraftParser parser{};
     parser.ParseJson(fileName.toStdString());
