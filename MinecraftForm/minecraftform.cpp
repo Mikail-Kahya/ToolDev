@@ -22,7 +22,6 @@ MinecraftForm::~MinecraftForm()
 void MinecraftForm::on_submit_clicked()
 {
     Block block{};
-
     // Set form data
     block.position.setX(ui->xInput->value());
     block.position.setY(ui->yInput->value());
@@ -55,16 +54,31 @@ void MinecraftForm::on_list_cellClicked(int row, int column)
 
 void MinecraftForm::on_actionLoad_triggered()
 {
+    m_Blocks.clear();
+    ui->list->clear();
+    ui->list->setRowCount(0);
     const QString fileName = QFileDialog::getOpenFileName(this,
                                                           tr("Json files"),
                                                           QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
                                                           tr("Json files (*.json)"));
-    QFile file{ fileName };
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
+    MinecraftParser parser{};
+    parser.ParseJson(fileName.toStdString());
+    for (const auto& layer : parser.GetLayers())
+    {
+        const std::string& material{ layer.second.material.name };
+        for (const Cube& cube : layer.second.cubes)
+        {
+            const Vector3& position{ cube.GetPosition() };
+            Block block{};
+            block.position.setX(position.x);
+            block.position.setY(position.y);
+            block.position.setZ(position.z);
+            block.material = material.c_str();
 
-    // read json and set positions through library
+            AddBlock(block);
+        }
+    }
 }
 
 void MinecraftForm::on_actionSaveAsJson_triggered()

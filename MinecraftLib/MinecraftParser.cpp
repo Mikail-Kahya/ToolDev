@@ -71,7 +71,7 @@ void MinecraftParser::SaveJson(std::string outputName) const
 		nlohmann::json positions{};
 		for (int idx{}; idx < static_cast<int>(layer.second.cubes.size()); ++idx)
 		{
-			const Vector3& location{ layer.second.cubes[idx].vertices[0] };
+            const Vector3& location{ layer.second.cubes[idx].GetPosition() };
 			nlohmann::json position{};
 			position[0] = location.x;
 			position[2] = location.y;
@@ -101,7 +101,12 @@ void MinecraftParser::AddCube(const Vector3& position, MaterialType material)
 
 void MinecraftParser::AddCube(const Vector3& position, const std::string& material)
 {
-	AddCube(position, GetMaterialType(material));
+    AddCube(position, GetMaterialType(material));
+}
+
+const std::map<MaterialType, Layer> &MinecraftParser::GetLayers() const
+{
+    return m_Layers;
 }
 
 void MinecraftParser::AddExtension(std::string& fileName, const std::string& extension) const
@@ -146,7 +151,7 @@ void MinecraftParser::ParseJson(const std::string& inputName)
 	}
 }
 
-MinecraftParser::Cube MinecraftParser::GenerateCube(Vector3 position) const
+Cube MinecraftParser::GenerateCube(Vector3 position) const
 {
 	Cube cube{};
 
@@ -200,7 +205,7 @@ MinecraftParser::Cube MinecraftParser::GenerateCube(Vector3 position) const
 	return cube;
 }
 
-MinecraftParser::Material MinecraftParser::GetMaterial(MaterialType materialType) const
+Material MinecraftParser::GetMaterial(MaterialType materialType) const
 {
 	Material material{};
 

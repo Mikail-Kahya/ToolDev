@@ -11,6 +11,26 @@ struct Vector3
 	float z{};
 };
 
+struct Material
+{
+    std::string name{ "Dirt" };
+    bool isOpaque{ true };
+};
+
+struct Cube
+{
+    const Vector3& GetPosition() const { return vertices[0]; }
+
+    std::vector<Vector3> vertices{};
+    std::vector<std::vector<int>> faces{};
+};
+
+struct Layer
+{
+    std::vector<Cube> cubes{};
+    Material material{};
+};
+
 enum class MaterialType
 {
 	dirt,
@@ -33,25 +53,6 @@ private:
 
 class MinecraftParser 
 {
-private:
-	struct Material
-	{
-		std::string name{ "Dirt" };
-		bool isOpaque{ true };
-	};
-
-	struct Cube
-	{
-		std::vector<Vector3> vertices{};
-		std::vector<std::vector<int>> faces{};
-	};
-
-	struct Layer
-	{
-		std::vector<Cube> cubes{};
-		Material material{};
-	};
-
 public:
 	MinecraftParser(float cubeSize = 1.f);
 	~MinecraftParser()												= default;
@@ -65,7 +66,9 @@ public:
 	void SaveJson(std::string outputName) const;
 	void ParseJson(const std::string& inputName);
 	void AddCube(const Vector3& position, MaterialType material);
-	void AddCube(const Vector3& position, const std::string& material);
+    void AddCube(const Vector3& position, const std::string& material);
+
+    const std::map<MaterialType, Layer>& GetLayers() const;
 
 private:
 	void AddExtension(std::string& fileName, const std::string& extension) const;
